@@ -70,7 +70,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\Debut\Source\Debut.Web\bin" />
-    <Copy SourceFiles="C:\Development\LyticsSitecoreConnector\LyticsSitecoreConnector\Lytics.config" DestinationFolder="C:\inetpub\wwwroot\Debut\Source\Debut.Web\App_Config\Include" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="[sitecore webroot bin directory]" />
+    <Copy SourceFiles="[your project root]\LyticsSitecoreConnector\Lytics.config" DestinationFolder="[sitecore config include folder path]" />
   </Target>
 </Project>
