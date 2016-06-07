@@ -50,7 +50,7 @@ namespace LyticsSitecoreConnector.Pipeline.Initialize
 		{
 			Database db = Factory.GetDatabase("master", false);
 			Item conditional = db.GetItem(Constants.ConditionalRenderingsCustomTagId);
-			if (conditional["Tags"].Split('|').All(x => x != Constants.LyticsRuleTagId))
+			if (conditional != null && conditional["Tags"].Split('|').All(x => x != Constants.LyticsRuleTagId))
 			{
 				using (new SecurityDisabler())
 				{
@@ -77,12 +77,18 @@ namespace LyticsSitecoreConnector.Pipeline.Initialize
 							   @"\packages\LyticsSitecoreConnector.Lytics.zip";
 				try
 				{
+					if (File.Exists(filepath))
+						File.Delete(filepath);
 					var manifestResourceStream = GetType().Assembly
 						.GetManifestResourceStream("LyticsSitecoreConnector.Resources.Lytics.zip");
-					manifestResourceStream?.CopyTo(new FileStream(filepath, FileMode.Create));
-					Task.Run(() =>
+					if (manifestResourceStream != null)
 					{
-
+						byte[] file = new byte[manifestResourceStream.Length];
+						for (int copied = 0; copied < manifestResourceStream.Length;)
+						{
+							copied += manifestResourceStream.Read(file, copied, (int)manifestResourceStream.Length - copied);
+						}
+						File.WriteAllBytes(filepath, file);
 						while (true)
 						{
 							if (!IsFileLocked(new FileInfo(filepath)))
@@ -112,7 +118,7 @@ namespace LyticsSitecoreConnector.Pipeline.Initialize
 							else
 								Thread.Sleep(1000);
 						}
-					});
+					}
 				}
 				catch (Exception e)
 				{
@@ -130,7 +136,7 @@ namespace LyticsSitecoreConnector.Pipeline.Initialize
 			Database db = Factory.GetDatabase("master", false);
 			if (db != null)
 			{
-				return typeof (Constants)
+				return typeof(Constants)
 					.GetFields()
 					.Any(f => db.GetItem(f.GetValue(null).ToString()) == null);
 			}

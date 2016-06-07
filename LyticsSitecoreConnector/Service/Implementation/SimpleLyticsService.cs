@@ -44,11 +44,12 @@ namespace LyticsSitecoreConnector.Service.Implementation
 			if (data != null && data.data != null)
 				foreach (dynamic segment in data.data)
 				{
-					yield return new SimpleLyticsSegment()
-					{
-						Id = segment.id,
-						Name = segment.name
-					};
+					if (!segment.invalid)
+						yield return new SimpleLyticsSegment()
+						{
+							Id = segment.id,
+							Name = segment.name
+						};
 				}
 		}
 
