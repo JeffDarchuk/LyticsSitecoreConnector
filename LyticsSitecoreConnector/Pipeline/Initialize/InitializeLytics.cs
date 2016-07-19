@@ -36,8 +36,10 @@ namespace LyticsSitecoreConnector.Pipeline.Initialize
 		}
 		public string AccessKey { get; set; }
 		public string RootAddress { get; set; }
+		public int MaxTimeout { get; set; }
 		public void Process(PipelineArgs args)
 		{
+			LyticsContext.MaxTimeout = MaxTimeout;
 			LyticsContext.Service = new SimpleLyticsService();
 			LyticsContext.AccessKey = AccessKey;
 			LyticsContext.RootAddress = RootAddress;

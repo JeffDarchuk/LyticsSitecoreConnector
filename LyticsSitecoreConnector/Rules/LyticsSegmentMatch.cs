@@ -17,8 +17,10 @@ namespace LyticsSitecoreConnector.Rules
 
 		protected override bool Execute(T ruleContext)
 		{
-			Item segment = ruleContext.Item.Database.GetItem(Segment);
-			return LyticsContext.Service.GetCurrentUserSegmentIds().Contains(segment["Segment Id"]);
+			Item obj = ruleContext.Item.Database.GetItem(Segment);
+			if (obj != null)
+				return LyticsContext.Service.GetCurrentUserSegmentIds().Contains(obj["Segment Id"]);
+			return false;
 		}
 	}
 }
