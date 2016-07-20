@@ -7,7 +7,7 @@ Set up your site to track user activities using Lytics.  Either using default se
 2.  Install the nuget package for this [defined here](https://www.nuget.org/packages/LyticsSitecoreConnector/)
 3.  The nuget package will deliver a Lytics.config file to the project at app_config/include/Lytics.config
 4.  Modify this config file with your Lytics key and define how to acquire the Lytics id
-..1.  Usually found in a users cookies.
-..2.  Cusomizable through adding a custom pipeline processor to expose the user's Lytics id
+  1.  Usually found in a users cookies.
+  2.  Cusomizable through adding a custom pipeline processor to expose the user's Lytics id
 5.  On first load the connector will detect that it needs to install itself and will place the neccisary sitecore items to facilitate the personalization.  This includes a node for segments, the rules conditions, and editing the conditional rendering rules definition to add Lytics rules.
 6.  Personalize your content using sitecore.
