@@ -13,6 +13,5 @@ namespace LyticsSitecoreConnector.Service.Interface
 		IEnumerable<ILyticsSegment> GetAllSegments();
 		HashSet<string> GetCurrentUserSegmentIds();
 		void IntegrateLyticsRules();
-		void LoadUserSegments();
 	}
 }

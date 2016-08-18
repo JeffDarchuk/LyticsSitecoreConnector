@@ -11,5 +11,6 @@ namespace LyticsSitecoreConnector.Data.Interface
 	{
 		string Name { get; set; }
 		string Id { get; set; }
+		string SlugName { get; set; }
 	}
 }

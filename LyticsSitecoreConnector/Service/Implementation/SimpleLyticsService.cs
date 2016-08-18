@@ -24,19 +24,6 @@ namespace LyticsSitecoreConnector.Service.Implementation
 	public class SimpleLyticsService : ILyticsService
 	{
 		private Dictionary<string, HashSet<string>> _segmentDef = new Dictionary<string, HashSet<string>>();
-		public IEnumerable<string> GetCurrentUserSegmentIds(string id)
-		{
-			WebClient wc = new WebClient();
-			dynamic data =
-				JsonConvert.DeserializeObject<ExpandoObject>(
-					wc.DownloadString(string.Format("{0}/api/entity/user/_uids/{1}?access_token={2}", LyticsContext.RootAddress, id, LyticsContext.AccessKey)));
-			if (data != null && data.data != null && data.data.segments_all != null)
-				foreach (string segment in data.data.segments_all)
-				{
-					yield return segment;
-				}
-		}
-
 		public IEnumerable<ILyticsSegment> GetAllSegments()
 		{
 			List<ILyticsSegment> ret = new List<ILyticsSegment>();
@@ -53,7 +40,8 @@ namespace LyticsSitecoreConnector.Service.Implementation
 							ret.Add(new SimpleLyticsSegment()
 							{
 								Id = segment.id,
-								Name = segment.name
+								Name = segment.name,
+								SlugName = segment.slug_name
 							});
 					}
 					catch (RuntimeBinderException ex)
@@ -66,17 +54,13 @@ namespace LyticsSitecoreConnector.Service.Implementation
 
 		public HashSet<string> GetCurrentUserSegmentIds()
 		{
-			var args = new LyticsPipelineArgs();
-			var pipeline = CorePipelineFactory.GetPipeline("getLyticsId", string.Empty);
-			pipeline.Run(args);
-			if (LyticsContext.MaxTimeout != 0)
+			HttpCookie cookie = HttpContext.Current.Request.Cookies["ly_segs"];
+			HashSet<string> ret = new HashSet<string>();
+			if (cookie != null && !string.IsNullOrWhiteSpace(cookie.Value))
 			{
-				int miliChunk = LyticsContext.MaxTimeout / 10;
-				for (int i = 0; i < 10 && _segmentDef[args.LyticsId] == null; i++)
-					Thread.Sleep(miliChunk);
+				ret.UnionWith(JsonConvert.DeserializeObject<Dictionary<string, string>>(HttpUtility.UrlDecode(cookie.Value)).Keys);
 			}
-			if (_segmentDef.ContainsKey(args.LyticsId) && _segmentDef[args.LyticsId] != null) return _segmentDef[args.LyticsId];
-			return new HashSet<string>();
+			return ret;
 		}
 
 		public void IntegrateLyticsRules()
@@ -110,7 +94,7 @@ namespace LyticsSitecoreConnector.Service.Implementation
 								using (new EditContext(item))
 								{
 									item["Segment Id"] = segment.Id;
-									item["Segment Name"] = segment.Name;
+									item["Segment Name"] = segment.SlugName;
 									item.Appearance.ReadOnly = true;
 								}
 						}
@@ -118,37 +102,6 @@ namespace LyticsSitecoreConnector.Service.Implementation
 							db.GetItem(populatedSegments[key]).Delete();
 					}
 				}
-			}
-		}
-
-		public void LoadUserSegments()
-		{
-			var args = new LyticsPipelineArgs();
-			var pipeline = CorePipelineFactory.GetPipeline("getLyticsId", string.Empty);
-			pipeline.Run(args);
-			ProcessUser(args.LyticsId);
-		}
-
-		private void ProcessUser(string userId)
-		{
-
-			if (!string.IsNullOrWhiteSpace(userId) && HttpContext.Current.Request.UrlReferrer == null)
-			{
-				Task.Run(() =>
-				{
-					HashSet<string> segments = new HashSet<string>();
-					WebClient wc = new WebClient();
-					dynamic data =
-						JsonConvert.DeserializeObject<ExpandoObject>(
-							wc.DownloadString(
-								string.Format("{0}/api/entity/user/_uids/{1}?access_token={2}&fields=none", LyticsContext.RootAddress, userId, LyticsContext.AccessKey)));
-					if (data != null && data.data != null && data.data.segments_all != null)
-						foreach (string segment in data.data.segments_all)
-						{
-							segments.Add(segment);
-						}
-					_segmentDef[userId] = segments;
-				});
 			}
 		}
 	}

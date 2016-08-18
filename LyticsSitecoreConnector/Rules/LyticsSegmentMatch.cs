@@ -19,7 +19,7 @@ namespace LyticsSitecoreConnector.Rules
 		{
 			Item obj = ruleContext.Item.Database.GetItem(Segment);
 			if (obj != null)
-				return LyticsContext.Service.GetCurrentUserSegmentIds().Contains(obj["Segment Id"]);
+				return LyticsContext.Service.GetCurrentUserSegmentIds().Contains(obj["Segment Name"]);
 			return false;
 		}
 	}

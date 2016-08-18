@@ -54,8 +54,6 @@
     <Compile Include="Data\Implementation\SimpleLyticsSegment.cs" />
     <Compile Include="Data\Interface\ILyticsSegment.cs" />
     <Compile Include="LyticsContext.cs" />
-    <Compile Include="Pipeline\GetLyticsId\CookieLyticsId.cs" />
-    <Compile Include="Pipeline\HttpRequest\GatherLyticsUserSegments.cs" />
     <Compile Include="Pipeline\Initialize\InitializeLytics.cs" />
     <Compile Include="Pipeline\LyticsPipelineArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
