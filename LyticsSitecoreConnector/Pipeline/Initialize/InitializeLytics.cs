@@ -51,6 +51,7 @@ namespace LyticsSitecoreConnector.Pipeline.Initialize
 		private void ActivateLyticsRules()
 		{
 			Database db = Factory.GetDatabase("master", false);
+			if (db == null) return;
 			Item conditional = db.GetItem(Constants.ConditionalRenderingsCustomTagId);
 			if (conditional != null && conditional["Tags"].Split('|').All(x => x != Constants.LyticsRuleTagId))
 			{
